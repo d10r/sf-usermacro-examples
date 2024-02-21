@@ -1,66 +1,19 @@
-## Foundry
+## About
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+This includes contracts showing how the [MacroForwarder](https://github.com/superfluid-finance/protocol-monorepo/blob/dev/packages/ethereum-contracts/contracts/utils/MacroForwarder.sol) can be used.
 
-Foundry consists of:
+A _User Macro_ is a contract which implements a specific use case, to be used with the MacroForwarder contract.
+[IUserDefinedMacro](https://github.com/superfluid-finance/protocol-monorepo/blob/dev/packages/ethereum-contracts/contracts/interfaces/utils/IUserDefinedMacro.sol) only requires one method: `buildBatchOperations`.
+A minimal User Macro contract doesn't need to implement more, and can leave the parameter encoding to an offchain component, as shown in [this JS App](https://github.com/d10r/sf-macro-forwarder-demo/blob/master/app.js).
+In this repo there's User Macro contracts providing more functionality:
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+### Convenience encoder
 
-## Documentation
+The method `getParams` takes arguments specific to the User Macro and returns them encoded to `bytes`. This returned bytes can be used to invoke `MacroForwarder.runMacro`
 
-https://book.getfoundry.sh/
+### Specialized children
 
-## Usage
-
-### Build
-
-```shell
-$ forge build
-```
-
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+For L2s the tx fees can be considerably reduced by reducing transaction calldata.
+In the example use case of deleting flows, this could be achieved by having User Macros specific for popular tokens, such that the token parameter can be omitted from the calldata.
+This could be achieved by having a generic User Macro (which works for any token) include factory functionality which allows it to deploy token specific children.
+This is showcased by `MultiFlowDeleteMacroWithFactory`.
