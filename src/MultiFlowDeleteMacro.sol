@@ -53,7 +53,11 @@ contract MultiFlowDeleteMacroForToken is MultiFlowDeleteMacro {
     function buildBatchOperations(ISuperfluid host, bytes memory params, address msgSender) public override view
         returns (ISuperfluid.Operation[] memory operations)
     {
-        return super.buildBatchOperations(host, abi.encode(superToken, params), msgSender);
+        return super.buildBatchOperations(
+            host,
+            abi.encode(superToken, abi.decode(params, (address[]))),
+            msgSender
+        );
     }
 
     // returns the abi encoded params for the macro, to be used with buildBatchOperations
