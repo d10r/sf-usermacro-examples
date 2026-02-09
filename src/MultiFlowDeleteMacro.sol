@@ -47,10 +47,10 @@ contract MultiFlowDeleteMacro is IUserDefinedMacro {
 
 // version of the macro specific for a Super Token, requires less calldata
 contract MultiFlowDeleteMacroForToken is MultiFlowDeleteMacro {
-    ISuperToken public immutable superToken;
+    ISuperToken public immutable SUPER_TOKEN;
 
     constructor(ISuperToken superToken_) {
-        superToken = superToken_;
+        SUPER_TOKEN = superToken_;
     }
 
     function buildBatchOperations(ISuperfluid host, bytes memory params, address msgSender) public override view
@@ -58,7 +58,7 @@ contract MultiFlowDeleteMacroForToken is MultiFlowDeleteMacro {
     {
         return super.buildBatchOperations(
             host,
-            abi.encode(superToken, abi.decode(params, (address[]))),
+            abi.encode(SUPER_TOKEN, abi.decode(params, (address[]))),
             msgSender
         );
     }
