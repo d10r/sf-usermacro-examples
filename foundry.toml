@@ -8,3 +8,8 @@ remappings = [
     '@superfluid-finance/=lib/superfluid-protocol-monorepo/packages',
     '@openzeppelin-v5/=lib/openzeppelin-contracts/',
 ]
+
+[lint]
+exclude_lints = [
+    "asm-keccak256",
+]
