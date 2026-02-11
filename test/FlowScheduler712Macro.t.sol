@@ -12,7 +12,7 @@ import { FlowSchedulerMacro } from "../src/FlowSchedulerMacro.sol";
 
 bytes32 constant LANG_EN = bytes32("en");
 string constant SECURITY_DOMAIN = "flowscheduler.xyz";
-string constant SECURITY_PROVIDER = "flowscheduler.superfluid.eth";
+string constant SECURITY_PROVIDER = "macros.superfluid.eth";
 uint256 constant DEFAULT_NONCE = uint256(1) << 64;
 
 contract FlowScheduler712MacroTest is FlowSchedulerMacroTest {
