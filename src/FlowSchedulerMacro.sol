@@ -8,7 +8,7 @@ import { IUserDefinedMacro, IUserDefined712Macro } from
 import { IFlowScheduler } from
     "@superfluid-finance/automation-contracts/scheduler/contracts/interface/IFlowScheduler.sol";
 import { ISuperToken } from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
-import { FlowRateFormatter } from "./utils/FlowRateFormatter.sol";
+import { FlowRateFormatter, AmountFormatter, RelativeTimeFormatter } from "./utils/FormattingLibs.sol";
 import { Strings } from "@openzeppelin-v5/contracts/utils/Strings.sol";
 
 using FlowRateFormatter for int96;
@@ -124,10 +124,38 @@ contract FlowScheduler712Macro is FlowSchedulerMacro, IUserDefined712Macro {
     {
         // the message is constructed based on the selected language and action arguments
         if (lang == "en") {
-            description = string(
-                abi.encodePacked(
-                    "Create flow schedule to ", Strings.toHexString(cfsParams.receiver), " with flow rate ", cfsParams.flowRate.toFlowRateString(), " ", cfsParams.superToken.symbol(), "/month"
-                )
+            string memory timeFragment;
+            if (cfsParams.startDate != 0 && cfsParams.endDate != 0) {
+                timeFragment = string.concat(
+                    " starting ",
+                    RelativeTimeFormatter.formatFromNow(cfsParams.startDate),
+                    " and stopping ",
+                    RelativeTimeFormatter.formatFromNow(cfsParams.endDate)
+                );
+            } else if (cfsParams.startDate != 0) {
+                timeFragment = string.concat(" starting ", RelativeTimeFormatter.formatFromNow(cfsParams.startDate));
+            } else if (cfsParams.endDate != 0) {
+                timeFragment = string.concat(" stopping ", RelativeTimeFormatter.formatFromNow(cfsParams.endDate));
+            } else {
+                timeFragment = "";
+            }
+            string memory amountFragment = cfsParams.startAmount == 0
+                ? ""
+                : string.concat(
+                    " with an initial transfer of ",
+                    AmountFormatter.formatTokenAmount(cfsParams.startAmount, 5),
+                    " ",
+                    cfsParams.superToken.symbol()
+                );
+            description = string.concat(
+                "Create flow schedule of ",
+                cfsParams.flowRate.toDailyFlowRateString(),
+                " ",
+                cfsParams.superToken.symbol(),
+                "/day to ",
+                Strings.toHexString(cfsParams.receiver),
+                timeFragment,
+                amountFragment
             );
         } else {
             revert UnsupportedLanguage();
