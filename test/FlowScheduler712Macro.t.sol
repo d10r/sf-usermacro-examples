@@ -22,7 +22,7 @@ contract FlowScheduler712MacroTest is FlowSchedulerMacroTest {
     function setUp() public override {
         super.setUp();
         scheduler712Macro = new FlowScheduler712Macro(IFlowScheduler(address(flowScheduler)));
-        forwarder = new Only712MacroForwarder(sf.host, address(0));
+        forwarder = new Only712MacroForwarder(sf.host);
 
         IAccessControl acl = IAccessControl(sf.host.getSimpleACL());
         vm.prank(address(sfDeployer));
