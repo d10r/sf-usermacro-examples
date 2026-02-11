@@ -9,6 +9,7 @@ import { IFlowScheduler } from
     "@superfluid-finance/automation-contracts/scheduler/contracts/interface/IFlowScheduler.sol";
 import { ISuperToken } from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
 import { FlowRateFormatter } from "./utils/FlowRateFormatter.sol";
+import { Strings } from "@openzeppelin-v5/contracts/utils/Strings.sol";
 
 using FlowRateFormatter for int96;
 
@@ -125,7 +126,7 @@ contract FlowScheduler712Macro is FlowSchedulerMacro, IUserDefined712Macro {
         if (lang == "en") {
             description = string(
                 abi.encodePacked(
-                    "Create flow schedule to ", cfsParams.receiver, " with flow rate ", cfsParams.flowRate.toFlowRateString(), " ", cfsParams.superToken.symbol(), "/month"
+                    "Create flow schedule to ", Strings.toHexString(cfsParams.receiver), " with flow rate ", cfsParams.flowRate.toFlowRateString(), " ", cfsParams.superToken.symbol(), "/month"
                 )
             );
         } else {
