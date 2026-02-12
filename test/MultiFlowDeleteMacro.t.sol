@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import { FoundrySuperfluidTester } from "@superfluid-finance/ethereum-contracts/test/foundry/FoundrySuperfluidTester.sol";
+import { FoundrySuperfluidTester } from "@superfluid-finance/ethereum-contracts/test/foundry/FoundrySuperfluidTester.t.sol";
 import { MultiFlowDeleteMacro } from "../src/MultiFlowDeleteMacro.sol";
 
 contract MultiFlowDeleteMacroTest is FoundrySuperfluidTester {
@@ -14,7 +14,7 @@ contract MultiFlowDeleteMacroTest is FoundrySuperfluidTester {
         multiFlowDeleteMacro = new MultiFlowDeleteMacro();
     }
 
-    function test_buildBatchOperations_smoke() public {
+    function test_buildBatchOperations_smoke() public view {
         address[] memory receivers = new address[](2);
         receivers[0] = bob;
         receivers[1] = carol;

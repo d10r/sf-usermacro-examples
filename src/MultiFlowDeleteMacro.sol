@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPLv3
-pragma solidity 0.8.23;
+pragma solidity ^0.8.23;
 
 import { ISuperfluid, BatchOperation, IConstantFlowAgreementV1, ISuperToken }
     from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
@@ -40,14 +40,17 @@ contract MultiFlowDeleteMacro is IUserDefinedMacro {
     function getParams(ISuperToken superToken, address[] memory receivers) external pure returns (bytes memory) {
         return abi.encode(superToken, receivers);
     }
+
+    // empty implementation
+    function postCheck(ISuperfluid host, bytes memory params, address msgSender) external view {}
 }
 
 // version of the macro specific for a Super Token, requires less calldata
 contract MultiFlowDeleteMacroForToken is MultiFlowDeleteMacro {
-    ISuperToken public immutable superToken;
+    ISuperToken public immutable SUPER_TOKEN;
 
     constructor(ISuperToken superToken_) {
-        superToken = superToken_;
+        SUPER_TOKEN = superToken_;
     }
 
     function buildBatchOperations(ISuperfluid host, bytes memory params, address msgSender) public override view
@@ -55,7 +58,7 @@ contract MultiFlowDeleteMacroForToken is MultiFlowDeleteMacro {
     {
         return super.buildBatchOperations(
             host,
-            abi.encode(superToken, abi.decode(params, (address[]))),
+            abi.encode(SUPER_TOKEN, abi.decode(params, (address[]))),
             msgSender
         );
     }
