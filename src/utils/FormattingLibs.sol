@@ -69,41 +69,60 @@ library AmountFormatter {
     }
 }
 
-library RelativeTimeFormatter {
+/// @notice Formats a Unix timestamp as "YYYY-mm-dd hh:mm UTC" (deterministic, no state).
+/// Uses the date conversion algorithm from BokkyPooBah's DateTime Library (MIT).
+/// https://github.com/bokkypoobah/BokkyPooBahsDateTimeLibrary
+library DateTimeFormatter {
     using Strings for uint256;
 
-    /// @notice Returns a human-readable diff from now to the given timestamp, e.g. "in 5 days and 3 hours", or "the past" if not in the future.
-    /// @param futureTimestamp Unix timestamp (if in the past, returns "the past").
-    function formatFromNow(uint256 futureTimestamp) internal view returns (string memory) {
-        if (futureTimestamp <= block.timestamp) return "the past";
-        uint256 delta = futureTimestamp - block.timestamp;
+    uint256 private constant SECONDS_PER_DAY = 24 * 60 * 60;
+    uint256 private constant SECONDS_PER_HOUR = 60 * 60;
+    uint256 private constant SECONDS_PER_MINUTE = 60;
+    int256 private constant OFFSET19700101 = 2440588;
 
-        uint256 days_ = delta / 86400;
-        uint256 rem = delta % 86400;
-        uint256 hours_ = rem / 3600;
-        rem = rem % 3600;
-        uint256 minutes_ = rem / 60;
-        uint256 seconds_ = rem % 60;
+    /// @notice Returns a deterministic date-time string for the given timestamp, e.g. "2026-02-11 14:30 UTC".
+    function formatTimestampUtc(uint256 timestamp) internal pure returns (string memory) {
+        (uint256 year, uint256 month, uint256 day) = _daysToDate(timestamp / SECONDS_PER_DAY);
+        uint256 secs = timestamp % SECONDS_PER_DAY;
+        uint256 hour = secs / SECONDS_PER_HOUR;
+        secs = secs % SECONDS_PER_HOUR;
+        uint256 minute = secs / SECONDS_PER_MINUTE;
 
-        if (days_ > 0) {
-            string memory d = _unit(days_, "day", "days");
-            if (hours_ > 0) return string.concat("in ", d, " and ", _unit(hours_, "hour", "hours"));
-            return string.concat("in ", d);
-        }
-        if (hours_ > 0) {
-            string memory h = _unit(hours_, "hour", "hours");
-            if (minutes_ > 0) return string.concat("in ", h, " and ", _unit(minutes_, "minute", "minutes"));
-            return string.concat("in ", h);
-        }
-        if (minutes_ > 0) {
-            string memory m = _unit(minutes_, "minute", "minutes");
-            if (seconds_ > 0) return string.concat("in ", m, " and ", _unit(seconds_, "second", "seconds"));
-            return string.concat("in ", m);
-        }
-        return string.concat("in ", _unit(seconds_, "second", "seconds"));
+        return string.concat(
+            year.toString(),
+            "-",
+            _pad2(month),
+            "-",
+            _pad2(day),
+            " ",
+            _pad2(hour),
+            ":",
+            _pad2(minute),
+            " UTC"
+        );
     }
 
-    function _unit(uint256 n, string memory singular, string memory plural) private pure returns (string memory) {
-        return string.concat(n.toString(), " ", n == 1 ? singular : plural);
+    /// @dev Days since 1970/01/01 to year/month/day. From BokkyPooBah's DateTime Library.
+    function _daysToDate(uint256 _days) private pure returns (uint256 year, uint256 month, uint256 day) {
+        int256 __days = int256(_days);
+        int256 L = __days + 68569 + OFFSET19700101;
+        int256 N = 4 * L / 146097;
+        L = L - (146097 * N + 3) / 4;
+        int256 _year = 4000 * (L + 1) / 1461001;
+        L = L - 1461 * _year / 4 + 31;
+        int256 _month = 80 * L / 2447;
+        int256 _day = L - 2447 * _month / 80;
+        L = _month / 11;
+        _month = _month + 2 - 12 * L;
+        _year = 100 * (N - 49) + _year + L;
+
+        year = uint256(_year);
+        month = uint256(_month);
+        day = uint256(_day);
+    }
+
+    function _pad2(uint256 n) private pure returns (string memory) {
+        if (n < 10) return string.concat("0", n.toString());
+        return n.toString();
     }
 }

@@ -8,7 +8,7 @@ import { IUserDefinedMacro, IUserDefined712Macro } from
 import { IFlowScheduler } from
     "@superfluid-finance/automation-contracts/scheduler/contracts/interface/IFlowScheduler.sol";
 import { ISuperToken } from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
-import { FlowRateFormatter, AmountFormatter, RelativeTimeFormatter } from "./utils/FormattingLibs.sol";
+import { FlowRateFormatter, AmountFormatter, DateTimeFormatter } from "./utils/FormattingLibs.sol";
 import { Strings } from "@openzeppelin-v5/contracts/utils/Strings.sol";
 
 using FlowRateFormatter for int96;
@@ -128,14 +128,14 @@ contract FlowScheduler712Macro is FlowSchedulerMacro, IUserDefined712Macro {
             if (cfsParams.startDate != 0 && cfsParams.endDate != 0) {
                 timeFragment = string.concat(
                     " starting ",
-                    RelativeTimeFormatter.formatFromNow(cfsParams.startDate),
-                    " and stopping ",
-                    RelativeTimeFormatter.formatFromNow(cfsParams.endDate)
+                    DateTimeFormatter.formatTimestampUtc(cfsParams.startDate),
+                    " stopping ",
+                    DateTimeFormatter.formatTimestampUtc(cfsParams.endDate)
                 );
             } else if (cfsParams.startDate != 0) {
-                timeFragment = string.concat(" starting ", RelativeTimeFormatter.formatFromNow(cfsParams.startDate));
+                timeFragment = string.concat(" starting ", DateTimeFormatter.formatTimestampUtc(cfsParams.startDate));
             } else if (cfsParams.endDate != 0) {
-                timeFragment = string.concat(" stopping ", RelativeTimeFormatter.formatFromNow(cfsParams.endDate));
+                timeFragment = string.concat(" stopping ", DateTimeFormatter.formatTimestampUtc(cfsParams.endDate));
             } else {
                 timeFragment = "";
             }
